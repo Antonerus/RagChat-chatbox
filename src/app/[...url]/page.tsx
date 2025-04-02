@@ -17,6 +17,7 @@ function reconstructUrl({url}: {url:string[]}) {
 
 const Page = async ({ params }: PageProps) => {
     const reconstructedUrl = reconstructUrl({ url: (await params).url as string[] })
+    console.log(reconstructedUrl)
 
     const sessionCookie = (await cookies()).get("sessionId")?.value
 

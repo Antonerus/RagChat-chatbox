@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Provider } from "@/components/Provider";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         )}
       >
         <Provider>
+          <Navbar />
           <main className="h-screen dark text-foreground bg-background">{children}</main>
         </Provider>
       </body>
