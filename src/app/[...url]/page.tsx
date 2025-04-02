@@ -10,22 +10,17 @@ interface PageProps {
 }
 
 function reconstructUrl({ url }: { url: string[] }) {
-    const decodedComponents = url.map((component) => decodeURIComponent(component));
-    return decodedComponents.join("/");
+    return url.map(decodeURIComponent).join("/");
 }
 
-const Page = async (props: Promise<PageProps>) => {
-    const { params } = await props; // Ensure `params` is awaited if it’s a Promise
-
+const Page = async ({ params }: PageProps) => {
     console.log("Params received:", params);
 
-    let url: string[];
+    let url: string[] = [];
     if (Array.isArray(params.url)) {
         url = params.url;
     } else if (params.url) {
         url = [params.url];
-    } else {
-        url = [];
     }
 
     const reconstructedUrl = reconstructUrl({ url });
@@ -35,7 +30,6 @@ const Page = async (props: Promise<PageProps>) => {
     const sessionId = (reconstructedUrl + "--" + sessionCookie).replace(/\//g, "");
 
     const isAlreadyIndexed = await redis.sismember("indexed-urls", reconstructedUrl);
-
     const initialMessages = await ragChat.history.getMessages({ amount: 10, sessionId });
 
     if (!isAlreadyIndexed) {
