@@ -4,11 +4,8 @@ import { redis } from "@/lib/redis";
 import { cookies } from "next/headers";
 
 interface PageProps {
-    params: { url?: string | string[] }; // Explicit type fix
-}
-
-function reconstructUrl(url: string[]): string {
-    return url.map(decodeURIComponent).join("/");
+    params: { url?: string | string[] };
+    searchParams?: Record<string, string | string[] | undefined>;
 }
 
 const Page = async ({ params }: PageProps) => {
@@ -21,7 +18,7 @@ const Page = async ({ params }: PageProps) => {
         url = [params.url];
     }
 
-    const reconstructedUrl = reconstructUrl(url);
+    const reconstructedUrl = url.map(decodeURIComponent).join("/");
     console.log("Reconstructed URL:", reconstructedUrl);
 
     const sessionCookie = (await cookies()).get("sessionId")?.value ?? "";
