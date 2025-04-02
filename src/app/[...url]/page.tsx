@@ -4,7 +4,7 @@ import { redis } from "@/lib/redis";
 import { cookies } from "next/headers";
 
 interface PageProps {
-    params: Record<string, any>; // Fixes the params typing issue
+    params: { url?: string | string[] }; // Explicit type fix
 }
 
 function reconstructUrl(url: string[]): string {
