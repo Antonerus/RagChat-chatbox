@@ -4,18 +4,19 @@ import { redis } from "@/lib/redis";
 import { cookies } from "next/headers";
 
 interface PageProps {
-  params: { url?: string | string[] };  // Ensure params are not wrapped in a Promise
+  params: Promise<{ url?: string | string[] }>; // params are a Promise here
   searchParams?: Record<string, string | string[] | undefined>;
 }
 
 const Page = async ({ params }: PageProps) => {
-  console.log("Params received:", params);  // Debugging
+  const resolvedParams = await params; // Await params to resolve the promise
+  console.log("Params received:", resolvedParams);  // Debugging
 
   let url: string[] = [];
-  if (Array.isArray(params.url)) {
-    url = params.url;
-  } else if (typeof params.url === "string") {
-    url = [params.url];
+  if (Array.isArray(resolvedParams.url)) {
+    url = resolvedParams.url;
+  } else if (typeof resolvedParams.url === "string") {
+    url = [resolvedParams.url];
   }
 
   const reconstructedUrl = url.map(decodeURIComponent).join("/");
