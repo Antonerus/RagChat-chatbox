@@ -4,40 +4,41 @@ import { redis } from "@/lib/redis";
 import { cookies } from "next/headers";
 
 interface PageProps {
-    params: { url?: string | string[] };
-    searchParams?: Record<string, string | string[] | undefined>;
+  params: Promise<{ url?: string | string[] }>;
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
 const Page = async ({ params }: PageProps) => {
-    console.log("Params received:", params);
+  const resolvedParams = await params; // Ensure we resolve the promise
+  console.log("Params received:", resolvedParams);
 
-    let url: string[] = [];
-    if (Array.isArray(params.url)) {
-        url = params.url;
-    } else if (typeof params.url === "string") {
-        url = [params.url];
-    }
+  let url: string[] = [];
+  if (Array.isArray(resolvedParams.url)) {
+    url = resolvedParams.url;
+  } else if (typeof resolvedParams.url === "string") {
+    url = [resolvedParams.url];
+  }
 
-    const reconstructedUrl = url.map(decodeURIComponent).join("/");
-    console.log("Reconstructed URL:", reconstructedUrl);
+  const reconstructedUrl = url.map(decodeURIComponent).join("/");
+  console.log("Reconstructed URL:", reconstructedUrl);
 
-    const sessionCookie = (await cookies()).get("sessionId")?.value ?? "";
-    const sessionId = (reconstructedUrl + "--" + sessionCookie).replace(/\//g, "");
+  const sessionCookie = (await cookies()).get("sessionId")?.value ?? "";
+  const sessionId = (reconstructedUrl + "--" + sessionCookie).replace(/\//g, "");
 
-    const isAlreadyIndexed = await redis.sismember("indexed-urls", reconstructedUrl);
-    const initialMessages = await ragChat.history.getMessages({ amount: 10, sessionId });
+  const isAlreadyIndexed = await redis.sismember("indexed-urls", reconstructedUrl);
+  const initialMessages = await ragChat.history.getMessages({ amount: 10, sessionId });
 
-    if (!isAlreadyIndexed) {
-        await ragChat.context.add({
-            type: "html",
-            source: reconstructedUrl,
-            config: { chunkOverlap: 50, chunkSize: 200 },
-        });
+  if (!isAlreadyIndexed) {
+    await ragChat.context.add({
+      type: "html",
+      source: reconstructedUrl,
+      config: { chunkOverlap: 50, chunkSize: 200 },
+    });
 
-        await redis.sadd("indexed-urls", reconstructedUrl);
-    }
+    await redis.sadd("indexed-urls", reconstructedUrl);
+  }
 
-    return <ChatWrapper sessionId={sessionId} initialMessages={initialMessages} />;
+  return <ChatWrapper sessionId={sessionId} initialMessages={initialMessages} />;
 };
 
 export default Page;
