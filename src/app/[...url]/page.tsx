@@ -3,14 +3,22 @@ import { ragChat } from "@/lib/rag-chat";
 import { redis } from "@/lib/redis";
 import { cookies } from "next/headers";
 
+interface PageProps {
+    params: {
+        url?: string | string[];
+    };
+}
+
 function reconstructUrl({ url }: { url: string[] }) {
     const decodedComponents = url.map((component) => decodeURIComponent(component));
     return decodedComponents.join("/");
 }
 
-const Page = async ({ params }: { params: { url?: string | string[] } }) => {
+const Page = async (props: Promise<PageProps>) => {
+    const { params } = await props; // Ensure `params` is awaited if it’s a Promise
+
     console.log("Params received:", params);
-    
+
     let url: string[];
     if (Array.isArray(params.url)) {
         url = params.url;
