@@ -9,18 +9,19 @@ interface PageProps {
     }
 }
 
-function reconstructUrl({url}: {url:string[]}) {
+function reconstructUrl({ url }: { url: string[] }) {
     const decodedComponents = url.map((component) => decodeURIComponent(component))
-
     return decodedComponents.join("/")
 }
 
 const Page = async ({ params }: PageProps) => {
-    const reconstructedUrl = reconstructUrl({ url: (await params).url as string[] })
+    // Ensure `url` is a string array before passing to `reconstructUrl`
+    const url = Array.isArray(params.url) ? params.url : [params.url || ""];
+    const reconstructedUrl = reconstructUrl({ url })
+
     console.log(reconstructedUrl)
 
     const sessionCookie = (await cookies()).get("sessionId")?.value
-
     const sessionId = (reconstructedUrl + "--" + sessionCookie).replace(/\//g, "")
 
     const isAlreadyIndexed = await redis.sismember("indexed-urls", reconstructedUrl)
@@ -36,8 +37,8 @@ const Page = async ({ params }: PageProps) => {
 
         await redis.sadd("indexed-urls", reconstructedUrl)
     }
-    
+
     return <ChatWrapper sessionId={sessionId} initialMessages={initialMessages} />
 }
 
-export default Page;
+export default Page
