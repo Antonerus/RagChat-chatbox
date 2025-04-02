@@ -4,12 +4,10 @@ import { redis } from "@/lib/redis";
 import { cookies } from "next/headers";
 
 interface PageProps {
-    params: {
-        url?: string | string[];
-    };
+    params: Record<string, any>; // Fixes the params typing issue
 }
 
-function reconstructUrl({ url }: { url: string[] }) {
+function reconstructUrl(url: string[]): string {
     return url.map(decodeURIComponent).join("/");
 }
 
@@ -19,14 +17,14 @@ const Page = async ({ params }: PageProps) => {
     let url: string[] = [];
     if (Array.isArray(params.url)) {
         url = params.url;
-    } else if (params.url) {
+    } else if (typeof params.url === "string") {
         url = [params.url];
     }
 
-    const reconstructedUrl = reconstructUrl({ url });
+    const reconstructedUrl = reconstructUrl(url);
     console.log("Reconstructed URL:", reconstructedUrl);
 
-    const sessionCookie = (await cookies()).get("sessionId")?.value;
+    const sessionCookie = (await cookies()).get("sessionId")?.value ?? "";
     const sessionId = (reconstructedUrl + "--" + sessionCookie).replace(/\//g, "");
 
     const isAlreadyIndexed = await redis.sismember("indexed-urls", reconstructedUrl);
