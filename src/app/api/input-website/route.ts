@@ -2,7 +2,7 @@ import { ragChat } from "@/lib/rag-chat"
 import { redis } from "@/lib/redis"
 import { NextRequest, NextResponse } from "next/server"
 
-export const POST = async(req: NextRequest) => {
+export const POST = async (req: NextRequest) => {
     try {
         const { url } = await req.json()
 
@@ -13,18 +13,16 @@ export const POST = async(req: NextRequest) => {
                 type: "html",
                 source: url,
                 config: { chunkOverlap: 50, chunkSize: 200 },
-           })
+            })
     
-           await redis.sadd("indexed-urls", url)
+            await redis.sadd("indexed-urls", url)
 
-           return NextResponse.json({ success: true })
+            return NextResponse.json({ success: true })
         }
 
         return NextResponse.json({ success: true })
     }
-    catch(error) {
+    catch {
         return NextResponse.json({ error: "Server Error" }, { status: 500 })
     }
-
-
 }
