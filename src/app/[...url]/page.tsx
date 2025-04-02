@@ -1,4 +1,4 @@
-import { ChatWrapper } from "@/components/ChatWrapper"
+/* import { ChatWrapper } from "@/components/ChatWrapper"
 import { ragChat } from "@/lib/rag-chat"
 import { redis } from "@/lib/redis"
 import { cookies } from "next/headers"
@@ -15,13 +15,21 @@ function reconstructUrl({ url }: { url: string[] }) {
 }
 
 const Page = async ({ params }: PageProps) => {
-    // Ensure `url` is a string array before passing to `reconstructUrl`
-    const url = Array.isArray(params.url) ? params.url : [params.url || ""];
+    // Check if `url` is valid and convert it to a string array if necessary
+    let url: string[];
+    if (Array.isArray(params.url)) {
+        url = params.url;
+    } else if (params.url) {
+        url = [params.url];
+    } else {
+        url = [];
+    }
+
     const reconstructedUrl = reconstructUrl({ url })
 
     console.log(reconstructedUrl)
 
-    const sessionCookie = (await cookies()).get("sessionId")?.value
+    const sessionCookie = cookies().get("sessionId")?.value
     const sessionId = (reconstructedUrl + "--" + sessionCookie).replace(/\//g, "")
 
     const isAlreadyIndexed = await redis.sismember("indexed-urls", reconstructedUrl)
@@ -42,3 +50,4 @@ const Page = async ({ params }: PageProps) => {
 }
 
 export default Page
+ */
