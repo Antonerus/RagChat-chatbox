@@ -3,7 +3,6 @@ import { RAGChat } from "@upstash/rag-chat";
 import { redis } from "./redis";
 import { ChatGroq } from "@langchain/groq";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import { ChatResult, ChatGenerationChunk } from "@langchain/core/outputs";
 import type { BaseMessage } from "@langchain/core/messages";
 
@@ -27,7 +26,6 @@ class GroqLangChainWrapper extends BaseChatModel {
 
   async _generate(
     messages: BaseMessage[],
-    options?: this["ParsedCallOptions"]
   ): Promise<ChatResult> {
     const result = await this.groq.invoke(messages);
     return {
@@ -40,8 +38,6 @@ class GroqLangChainWrapper extends BaseChatModel {
 
   async *_streamResponseChunks(
     messages: BaseMessage[],
-    options?: this["ParsedCallOptions"],
-    runManager?: any
   ): AsyncGenerator<ChatGenerationChunk> {
     const stream = await this.groq.stream(messages);
     for await (const chunk of stream) {
