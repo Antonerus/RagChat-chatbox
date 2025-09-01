@@ -12,7 +12,7 @@ class GroqLangChainWrapper extends BaseChatModel {
   constructor() {
     super({});
     this.groq = new ChatGroq({
-      modelName: "llama3-70b-8192",
+      modelName: "llama-3.3-70b-versatile",
       apiKey: process.env.GROQ_API_KEY!,
       temperature: 0.7,
       streaming: true,
